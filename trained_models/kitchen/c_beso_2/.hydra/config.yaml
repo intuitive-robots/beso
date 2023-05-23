@@ -1,0 +1,165 @@
+agents:
+  model:
+    _target_: beso.agents.diffusion_agents.k_diffusion.score_wrappers.GCDenoiser
+    _recursive_: false
+    sigma_data: ${sigma_data}
+    inner_model:
+      _target_: beso.agents.diffusion_agents.k_diffusion.score_gpts.DiffusionGPT
+      state_dim: ${obs_dim}
+      action_dim: ${action_dim}
+      goal_conditioned: ${goal_conditioning}
+      embed_dim: ${hidden_dim}
+      n_layers: ${num_hidden_layers}
+      goal_seq_len: ${future_seq_length}
+      obs_seq_len: ${window_size}
+      sigma_vocab_size: ${n_timesteps}
+      embed_pdrob: 0
+      goal_drop: ${cond_mask_prob}
+      attn_pdrop: 0.3
+      resid_pdrop: 0
+      time_embedding_fn:
+        _target_: beso.agents.diffusion_agents.k_diffusion.utils.return_time_sigma_embedding_model
+        embedding_type: Linear
+        time_embed_dim: ${hidden_dim}
+        device: ${device}
+      n_heads: 6
+      device: ${device}
+      linear_output: true
+  input_encoder:
+    _target_: beso.agents.input_encoders.obs_encoder.NoEncoder
+    device: ${device}
+    state_modality: observation
+    goal_modality: goal_observation
+  _target_: beso.agents.diffusion_agents.beso_agent.BesoAgent
+  _recursive_: false
+  optimization:
+    _target_: torch.optim.AdamW
+    lr: 0.0001
+    betas:
+    - 0.9
+    - 0.999
+  lr_scheduler:
+    _target_: torch.optim.lr_scheduler.StepLR
+    step_size: 100
+    gamma: 0.99
+  obs_modalities: ${obs_modalities}
+  goal_modalities: ${goal_modalities}
+  target_modality: ${target_modality}
+  train_method: ${train_method}
+  max_epochs: ${max_epochs}
+  goal_conditioned: ${goal_conditioning}
+  pred_last_action_only: false
+  eval_every_n_steps: ${eval_every_n_steps}
+  max_train_steps: ${max_train_steps}
+  num_sampling_steps: ${n_timesteps}
+  sampler_type: ddim
+  sigma_data: ${sigma_data}
+  use_kde: false
+  rho: 5.0
+  sigma_min: 0.005
+  sigma_max: 1
+  sigma_sample_density_type: loglogistic
+  sigma_sample_density_mean: -2
+  sigma_sample_density_std: -2
+  use_ema: ${use_ema}
+  decay: ${decay}
+  device: ${device}
+  update_ema_every_n_steps: ${update_ema_every_n_steps}
+  goal_window_size: ${future_seq_length}
+  window_size: ${window_size}
+  patience: 80
+workspaces:
+  _target_: beso.workspaces.kitchen_workspace_manager.FrankaKitchenManager
+  _recursive_: false
+  dataset_fn:
+    _target_: beso.envs.franka_kitchen.dataloader.get_relay_kitchen_train_val
+    data_directory: ${data_path}
+    train_fraction: ${workspaces.train_fraction}
+    random_seed: ${seed}
+    device: ${device}
+    window_size: ${window_size}
+    goal_conditional: ${goal_conditional}
+    future_seq_len: ${future_seq_length}
+    only_sample_tail: false
+    only_sample_seq_end: false
+  seq_goal_fn:
+    _target_: beso.envs.franka_kitchen.goals.get_goal_fn
+    data_path: ${data_path}
+    goal_conditional: ${goal_conditional}
+    sequential_goal: true
+    goal_seq_len: ${future_seq_length}
+    seed: ${seed}
+    train_fraction: 1
+    device: ${device}
+  multi_goal_fn:
+    _target_: beso.envs.franka_kitchen.goals.get_goal_fn
+    data_path: ${data_path}
+    goal_conditional: ${goal_conditional}
+    sequential_goal: false
+    goal_seq_len: ${future_seq_length}
+    seed: ${seed}
+    train_fraction: 1
+    device: ${device}
+  env_name: kitchen-all-v0
+  seed: ${seed}
+  train_batch_size: 1024
+  test_batch_size: 1024
+  num_workers: 4
+  eval_n_times: 100
+  eval_n_steps: 280
+  device: ${device}
+  scale_data: ${scale_data}
+  train_fraction: 0.95
+  render: ${render}
+log_dir: logs/franka_kitchen/
+plot_dir: plots/franka_kitchen/
+plot_name: ${now:%Y-%m-%d}.png
+data_path: /path/to/beso/environments/data/cbet_datasets/relay_kitchen
+group: edm_loglogistics_seed_run
+wandb:
+  entity: add_wandb_acc_name
+  project: beso_experiments
+device: cuda
+seed: 4
+scale_data: false
+future_seq_length: 2
+window_size: 4
+goal_conditioning: true
+goal_conditional: future
+action_dim: 9
+input_dim: 60
+obs_dim: 30
+render: false
+goal_dim: 30
+hidden_dim: 360
+use_spectral_norm: false
+num_hidden_layers: 6
+train_method: steps
+max_train_steps: 40000
+max_epochs: 500
+eval_every_n_steps: 4000
+residual_style: true
+latent_dim: 12
+evaluate_multigoal: true
+evaluate_sequential: false
+fine_tune_agent: false
+use_goal_in_prior: true
+use_state_in_prior: true
+obs_modalities:
+- observation
+goal_modalities:
+- goal_observation
+target_modality: action
+decay: 0.999
+update_ema_every_n_steps: 1
+t_dim: 16
+use_ema: true
+sigma_data: 0.5
+cond_mask_prob: 0
+cond_mask_prob_plans: 0
+ff_dim: 128
+cond_lambda: 1
+n_timesteps: 3
+use_goals_in_action_decoder: true
+use_goal_in_recognition: true
+masking_rate: 0.5

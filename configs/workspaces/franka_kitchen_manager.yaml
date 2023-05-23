@@ -1,0 +1,48 @@
+_target_: beso.workspaces.kitchen_workspace_manager.FrankaKitchenManager
+_recursive_: false
+
+dataset_fn:
+  _target_: beso.envs.franka_kitchen.dataloader.get_relay_kitchen_train_val
+  data_directory: ${data_path}
+  train_fraction:  ${workspaces.train_fraction}
+  random_seed: ${seed}
+  device: ${device}
+  # scale_data: ${scale_data}
+  window_size: ${window_size}
+  goal_conditional: ${goal_conditional}
+  future_seq_len: ${future_seq_length}
+  only_sample_tail: False
+  only_sample_seq_end: False
+
+seq_goal_fn:
+  _target_: beso.envs.franka_kitchen.goals.get_goal_fn
+  data_path: ${data_path}
+  goal_conditional: ${goal_conditional}
+  sequential_goal: True
+  goal_seq_len: ${future_seq_length}
+  seed: ${seed}
+  train_fraction: 1
+  device: ${device}
+
+multi_goal_fn:
+  _target_: beso.envs.franka_kitchen.goals.get_goal_fn
+  data_path: ${data_path}
+  goal_conditional: ${goal_conditional}
+  sequential_goal: False
+  goal_seq_len: ${future_seq_length}
+  seed: ${seed}
+  train_fraction: 1
+  device: ${device}
+
+env_name: 'kitchen-all-v0'
+seed: ${seed}
+train_batch_size: 1024 
+test_batch_size:  1024 
+num_workers: 4
+eval_n_times: 100
+eval_n_steps: 280
+device: ${device}
+scale_data: ${scale_data}
+train_fraction: 0.95
+render: ${render}
+

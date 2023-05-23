@@ -1,0 +1,43 @@
+_target_: beso.workspaces.block_push_workspace.BlockPushingManager
+_recursive_: false
+
+dataset_fn:
+  _target_: beso.envs.block_pushing.data.dataloader.get_push_train_val
+  data_directory: ${data_path}
+  train_fraction: 0.95
+  random_seed: ${seed}
+  device: ${device}
+  # scale_data: ${scale_data}
+  window_size: ${window_size}
+  goal_conditional: ${goal_conditional}
+  future_seq_len: ${future_seq_length}
+  reduce_obs_dim: ${reduce_obs_dim}
+  only_sample_tail: false # true change again 
+  only_sample_seq_end: False 
+  transform:
+    # NOTE: blockpush_mask_targets: for future conditional
+    # mask out targets in obs; only keep block positions in future obs conditionals
+    _target_: beso.envs.utils.blockpush_mask_targets
+    mask_targets: ${mask_targets}
+    reduce_obs_dim: ${reduce_obs_dim}
+
+goal_fn:
+  _target_: beso.envs.block_pushing.data.goals.get_goal_fn
+  data_path: ${data_path}
+  goal_conditional: ${goal_conditional}
+  goal_seq_len: ${future_seq_length}
+  seed: ${seed}
+  train_fraction: 0.95
+  zero_goals: true
+
+seed: ${seed}
+train_batch_size: 1024
+test_batch_size: 1024
+num_workers: 4
+eval_n_times: 100
+eval_n_steps: 300
+device: ${device}
+scale_data: ${scale_data}
+train_fraction: 0.95
+render: False
+use_minmax_scaler: true

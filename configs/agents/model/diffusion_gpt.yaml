@@ -1,0 +1,30 @@
+_target_: beso.agents.diffusion_agents.k_diffusion.score_wrappers.GCDenoiser
+_recursive_: false
+
+sigma_data: ${sigma_data}
+
+inner_model:
+  _target_: beso.agents.diffusion_agents.k_diffusion.score_gpts.DiffusionGPT
+  state_dim: ${obs_dim}
+  action_dim: ${action_dim}
+  goal_conditioned: ${goal_conditioning}
+  embed_dim: ${hidden_dim}
+  n_layers: ${num_hidden_layers}
+  goal_seq_len: ${future_seq_length}
+  obs_seq_len: ${window_size}
+  sigma_vocab_size: ${n_timesteps}
+  embed_pdrob: 0
+  goal_drop: ${cond_mask_prob}
+  attn_pdrop: ${attn_pdrop} # 0.3
+  resid_pdrop: ${resid_pdrop} #.3
+  time_embedding_fn:
+    _target_: beso.agents.diffusion_agents.k_diffusion.utils.return_time_sigma_embedding_model
+     # 'GaussianFourier' 'FourierFeatures' or 'Sinusoidal' 'MLP'
+    embedding_type: 'Linear'
+    time_embed_dim: ${hidden_dim} 
+    device: ${device}
+  # Architecture details
+  n_heads: ${n_heads}
+  device: ${device}
+  linear_output: True
+  

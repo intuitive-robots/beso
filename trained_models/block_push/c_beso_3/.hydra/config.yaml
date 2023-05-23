@@ -1,0 +1,159 @@
+agents:
+  model:
+    _target_: beso.agents.diffusion_agents.k_diffusion.score_wrappers.GCDenoiser
+    _recursive_: false
+    sigma_data: ${sigma_data}
+    inner_model:
+      _target_: beso.agents.diffusion_agents.k_diffusion.score_gpts.DiffusionGPT
+      state_dim: ${obs_dim}
+      action_dim: ${action_dim}
+      goal_conditioned: ${goal_conditioning}
+      embed_dim: ${hidden_dim}
+      n_layers: ${num_hidden_layers}
+      goal_seq_len: ${future_seq_length}
+      obs_seq_len: ${window_size}
+      sigma_vocab_size: ${n_timesteps}
+      embed_pdrob: 0
+      goal_drop: ${cond_mask_prob}
+      attn_pdrop: ${attn_pdrop}
+      resid_pdrop: ${resid_pdrop}
+      time_embedding_fn:
+        _target_: beso.agents.diffusion_agents.k_diffusion.utils.return_time_sigma_embedding_model
+        embedding_type: Linear
+        time_embed_dim: ${hidden_dim}
+        device: ${device}
+      n_heads: ${n_heads}
+      device: ${device}
+      linear_output: true
+  input_encoder:
+    _target_: beso.agents.input_encoders.obs_encoder.NoEncoder
+    device: ${device}
+    state_modality: observation
+    goal_modality: goal_observation
+  _target_: beso.agents.diffusion_agents.beso_agent.BesoAgent
+  _recursive_: false
+  optimization:
+    _target_: torch.optim.Adam
+    lr: 0.0001
+  lr_scheduler:
+    _target_: torch.optim.lr_scheduler.StepLR
+    step_size: 100
+    gamma: 0.99
+  obs_modalities: ${obs_modalities}
+  goal_modalities: ${goal_modalities}
+  target_modality: ${target_modality}
+  train_method: ${train_method}
+  max_epochs: ${max_epochs}
+  goal_conditioned: ${goal_conditioning}
+  pred_last_action_only: false
+  eval_every_n_steps: ${eval_every_n_steps}
+  max_train_steps: ${max_train_steps}
+  num_sampling_steps: ${n_timesteps}
+  sampler_type: ddim
+  sigma_data: ${sigma_data}
+  rho: 5.0
+  sigma_min: 0.05
+  sigma_max: 1
+  sigma_sample_density_type: loglogistic
+  sigma_sample_density_mean: -0.6
+  sigma_sample_density_std: 1.6
+  use_ema: ${use_ema}
+  decay: ${decay}
+  device: ${device}
+  update_ema_every_n_steps: ${update_ema_every_n_steps}
+  goal_window_size: ${future_seq_length}
+  window_size: ${window_size}
+  patience: 80
+workspaces:
+  _target_: beso.workspaces.block_push_workspace.BlockPushingManager
+  _recursive_: false
+  dataset_fn:
+    _target_: beso.envs.block_pushing.data.dataloader.get_push_train_val
+    data_directory: ${data_path}
+    train_fraction: 0.95
+    random_seed: ${seed}
+    device: ${device}
+    window_size: ${window_size}
+    goal_conditional: ${goal_conditional}
+    future_seq_len: ${future_seq_length}
+    reduce_obs_dim: ${reduce_obs_dim}
+    only_sample_tail: false
+    only_sample_seq_end: false
+    transform:
+      _target_: beso.envs.utils.blockpush_mask_targets
+      mask_targets: ${mask_targets}
+      reduce_obs_dim: ${reduce_obs_dim}
+  goal_fn:
+    _target_: beso.envs.block_pushing.data.goals.get_goal_fn
+    data_path: ${data_path}
+    goal_conditional: ${goal_conditional}
+    goal_seq_len: ${future_seq_length}
+    seed: ${seed}
+    train_fraction: 0.95
+    zero_goals: true
+  seed: ${seed}
+  train_batch_size: 1024
+  test_batch_size: 1024
+  num_workers: 4
+  eval_n_times: 100
+  eval_n_steps: 300
+  device: ${device}
+  scale_data: ${scale_data}
+  train_fraction: 0.95
+  render: false
+  use_minmax_scaler: true
+log_dir: logs/block_pushing/
+plot_dir: plots/block_pushing/
+plot_name: ${now:%Y-%m-%d}.png
+data_path: /path/to/beso/environments/data/cbet_datasets/multimodal_push_fixed_target
+group: diff_behavior_test_1
+wandb:
+  entity: add_wandb_acc_name
+  project: gc_block_push
+device: cuda
+seed: 8
+scale_data: true
+future_seq_length: 1
+window_size: 5
+mask_targets: false
+reduce_obs_dim: true
+goal_conditioning: true
+goal_conditional: future
+action_dim: 2
+input_dim: 18
+obs_dim: 10
+goal_dim: 4
+hidden_dim: 240
+use_spectral_norm: false
+num_hidden_layers: 4
+train_method: steps
+max_train_steps: 60000
+max_epochs: 100
+eval_every_n_steps: 4000
+evaluate_multigoal: true
+evaluate_sequential: true
+obs_modalities:
+- observation
+goal_modalities:
+- goal_observation
+target_modality: action
+attn_pdrop: 0.05
+resid_pdrop: 0.05
+n_heads: 12
+t_dim: 16
+use_ema: true
+decay: 0.999
+update_ema_every_n_steps: 1
+sigma_data: 0.5
+cond_mask_prob: 0
+cond_lambda: 1
+n_timesteps: 3
+use_goals_in_action_decoder: true
+use_goal_in_recognition: true
+masking_rate: 0.5
+cond_mask_prob_plans: 0
+fine_tune_agent: false
+use_goal_in_prior: true
+use_state_in_prior: true
+residual_style: true
+latent_dim: 12

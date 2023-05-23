@@ -1,0 +1,41 @@
+
+# This is the config file for the evaluation of the model
+# you can analyze the performance of the model in different ways
+# first chose the path to the model you want to evaluate
+model_store_path: '/path/to/beso/trained_models/kitchen/c_beso_1'
+# next define some general stuff for evaluation
+log_wandb: True
+
+num_runs: 100
+n_inference_steps: 3
+# chose one of the samplers mentioned in the readme file here
+sampler_type: euler_ancestral
+# this is the noise range for the model
+sigma_min: 0.005
+sigma_max: 1
+rho: 5
+# these two parameters make the Euler and Heun sampler stochastic 
+# see Karras et al. 2022 for more details 
+s_churn: 0
+s_min: 0
+get_mean: None
+# this value is only relevant for ClassifierFreeGuidance trained models
+cond_lambda: 1
+# the time steps method
+noise_scheduler: linear
+device: cpu
+# not really used
+use_scaler: False
+# this is to record videos of the evaluation
+render_workspace:  False
+store_video:  False
+
+### next chose what kind of evaluation you want to do
+# if you want to evaluate a model just set the following one to true
+test_single_variant:  True
+# for comparisons of different components set one of the following to true
+test_classifier_free_guidance:  False
+test_all_samplers:  False
+compare_noisy_sampler:  False
+compare_samplers_over_diffent_steps:  False
+compare_classifier_free_guidance:  False

@@ -1,0 +1,67 @@
+defaults:
+  - agents: beso_franka_kitchen
+  - workspaces: franka_kitchen_manager
+
+log_dir: logs/franka_kitchen/
+plot_dir: plots/franka_kitchen/
+plot_name: ${now:%Y-%m-%d}.png
+data_path: /path/to/beso/environments/data/cbet_datasets/relay_kitchen
+
+hydra:
+  run:
+    dir: ${log_dir}/runs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: ${log_dir}/runs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    subdir: ${hydra.job.override_dirname}
+
+group: group_name
+
+wandb:
+  entity: add_wandb_acc_name
+  project: beso_experiments
+
+device: 'cuda'
+seed: 42
+scale_data: False
+future_seq_length: 2
+window_size: 4
+# either onehot or future
+goal_conditioning: True
+goal_conditional: 'future'
+action_dim: 9
+input_dim: 60
+obs_dim: 30
+render: false
+goal_dim: 30
+
+# policy model params
+hidden_dim: 360 
+use_spectral_norm: false
+num_hidden_layers: 6
+train_method: 'steps'
+max_train_steps: 40000
+max_epochs: 500
+eval_every_n_steps: 4000
+residual_style: True
+
+# define evaluation types
+evaluate_multigoal: True
+evaluate_sequential: false
+
+obs_modalities: ['observation']
+goal_modalities: ['goal_observation']
+target_modality: 'action'
+
+# BESO hyperparmeters
+attn_pdrop: 0.3
+resid_pdrop: 0
+n_heads: 6
+t_dim: 16
+use_ema: True
+sigma_data: 0.5
+cond_mask_prob: 0.1
+cond_lambda: 1.5
+n_timesteps: 3
+decay: 0.999
+update_ema_every_n_steps: 1
+
