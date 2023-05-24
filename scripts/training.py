@@ -10,7 +10,6 @@ import numpy as np
 
 from beso.agents.diffusion_agents.k_diffusion.classifier_free_sampler import ClassifierFreeSampleModel
 from beso.agents.diffusion_agents.beso_agent import BesoAgent
-from beso.agents.lmp_agents.lmp_agent import LatentPlansAgent
 
 log = logging.getLogger(__name__)
 
