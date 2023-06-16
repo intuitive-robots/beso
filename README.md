@@ -97,6 +97,9 @@ We can easily train the agent on 10 seeds sequentially by using:
 (play)[beso]$ python scripts/training.py --multirun seed=1,2,3,4,5,6,7,8,9,10
 ```
 
+Please note, that we are using wandb to log the training of our model in this repo. Thus one need to adjust, the 
+wandb variable in the main config file with your wandb entity and project name. 
+
 ---
 
 ### Understanding BESO
@@ -169,7 +172,7 @@ This repo relies on the following existing codebases:
 - The inital environments are adapted from [Relay Policy Learning](https://github.com/google-research/relay-policy-learning), [IBC](https://github.com/google-research/ibc) and [BET](https://github.com/notmahi/bet).
 - The continuous time diffusion model is adapted from [k-diffusion](https://github.com/crowsonkb/k-diffusion) together with all sampler implementations. 
 - the ```score_gpt``` class is adapted from [miniGPT](https://github.com/karpathy/minGPT).
-- A few samplers are adapted from [dpm-solver](https://github.com/LuChengTHU/dpm-solver)
+- A few samplers are have been imported from [dpm-solver](https://github.com/LuChengTHU/dpm-solver)
 
 ---
 
