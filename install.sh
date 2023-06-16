@@ -42,6 +42,8 @@ pip install mujoco-py
 
 # Install other PIP Dependencies
 pip install torch torchvision --extra-index-url https://download.pytorch.org/whl/cu116
+pip install setuptools==65.5.0
+pip install wheel==0.38.4
 pip install dm-control==0.0.403778684
 pip install gym==0.21.0
 pip install termcolor
