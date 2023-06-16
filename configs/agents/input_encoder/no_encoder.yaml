@@ -1,0 +1,5 @@
+_target_: beso.agents.input_encoders.obs_encoder.NoEncoder
+
+device: ${device}
+state_modality: 'observation'
+goal_modality: 'goal_observation'

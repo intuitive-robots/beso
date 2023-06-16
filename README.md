@@ -49,7 +49,7 @@ After adjusting the data paths in both configuration files, you should be ready 
 
 ### Code Overview
 
-<img src="images/GC_Franka_Kitchen.png">
+<img src="images/GC_Franka_Kitchen.png"  alt="drawing" width="100%">
 
 All configurations are managed using configs from [hydra](https://hydra.cc/docs/intro/), a hierarchical configuration manager. Each configuration component is represented as a separate file within a lower-level folder.  The main configuration file for each environment can be found under the ```/configs``` directory. To train and test an agent, you need to run the desired config file within the ```scripts/training.py``` method. The repo uses WandB to log and monitor all runs, please add your wandb account to the config together with a project name.\
 Hydra needs absolute paths, so please change the default paths in your code ```/path/to/beso``` to your local path.
@@ -101,7 +101,7 @@ We can easily train the agent on 10 seeds sequentially by using:
 
 ### Understanding BESO
 
-<img src="images/BESO_architecture_visualization.png" width=1000 height=300>
+<img src="images/BESO_architecture_visualization.png" alt="drawing" width="100%">
 
 An overview of the action generation process of BESO is visualized above. New actions are generated during rollouts with the ```predict``` method of the
 ```beso_agent```. Inside  ```predict``` we call the ```sample_loop``` to start the action denoising process.
