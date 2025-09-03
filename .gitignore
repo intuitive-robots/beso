@@ -163,3 +163,6 @@ logs/
 wandb/
 .vscode/
 *.pdf
+
+# Claude Code settings
+.claude/*
